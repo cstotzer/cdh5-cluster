@@ -2,7 +2,7 @@
 
 # start sshd
 echo "start sshd..."
-/usr/sbin/sshd -D 
+/usr/sbin/sshd 
 
 # start sef
 echo -e "\nstart serf..." 

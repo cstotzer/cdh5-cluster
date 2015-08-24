@@ -8,7 +8,7 @@ ADD cloudera-cdh5.repo /etc/yum.repos.d/
 RUN yum clean all && yum upgrade -y
 
 # Install software 
-RUN yum clean all && yum install -y openssh-server vim hadoop-yarn hadoop-hdfs java-1.8.0-openjdk unzip curl dnsmasq bind-utils && yum clean all	
+RUN yum clean all && yum install -y openssh-server openssh-clients vim hadoop-yarn hadoop-hdfs java-1.8.0-openjdk unzip curl dnsmasq bind-utils && yum clean all	
 
 # dnsmasq configuration
 ADD dnsmasq/* /etc/
@@ -24,7 +24,7 @@ ADD serf/* $SERF_CONFIG_DIR/
 ADD handlers $SERF_CONFIG_DIR/handlers
 RUN chmod +x  $SERF_CONFIG_DIR/event-router.sh $SERF_CONFIG_DIR/start-serf-agent.sh
 
-ADD config/* /usr/local/ 
+ADD config/* /tmp
 
 RUN ssh-keygen -A
 
@@ -32,7 +32,13 @@ RUN ssh-keygen -A
 RUN mkdir /var/run/sshd && \
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
-mv /usr/local/ssh_config ~/.ssh/config
+mv /tmp/ssh_config ~/.ssh/config && \
+chmod 600 /root/.ssh/* &&
+
+# run general daemons
+RUN mv /tmp/start-ssh-serf.sh ~/start-ssh-serf.sh && \
+chmod +x ~/start-ssh-serf.sh && \
+chmod 1777 tmp
 
 # create root password
 RUN echo 'root:root' | chpasswd
