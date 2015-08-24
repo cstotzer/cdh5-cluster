@@ -13,5 +13,5 @@ serf members -status=alive | while read line ;do
   echo ptr-record=${NEXT_IP_ARRAY[3]}.${NEXT_IP_ARRAY[2]}.${NEXT_IP_ARRAY[1]}.${NEXT_IP_ARRAY[0]}.in-addr.arpa,$NEXT_HOST
 done > /etc/dnsmasq.d/0hosts
 
-kill -9 $(cat /var/run/dnsmasq)
+kill -9 $(cat /var/run/dnsmasq) &> /dev/null
 /usr/sbin/dnsmasq

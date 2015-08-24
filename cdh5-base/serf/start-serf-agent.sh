@@ -1,6 +1,6 @@
 #!/bin/bash
 
-service dnsmasq start
+/usr/sbin/dnsmasq &> /dev/null
 
 SERF_CONFIG_DIR=/etc/serf
 

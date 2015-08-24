@@ -26,9 +26,7 @@ RUN chmod +x  $SERF_CONFIG_DIR/event-router.sh $SERF_CONFIG_DIR/start-serf-agent
 
 ADD config/* /usr/local/ 
 
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key && \
-ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key && \
-ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key
+RUN ssh-keygen -A
 
 # configure password-less ssh
 RUN mkdir /var/run/sshd && \
@@ -36,8 +34,7 @@ ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
 mv /usr/local/ssh_config ~/.ssh/config
 
-# Enable password-less login from host
-ADD ~/.ssh/id_dsa.pub ~/.ssh && cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
+# create root password
+RUN echo 'root:root' | chpasswd
 
 CMD 'bash'
-50f78aefd3d7
