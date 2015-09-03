@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://cdh5-namenode.localdomain:9000/</value>
+    <description>NameNode URI</description>
+  </property>
+  <property>
+    <name>hadoop.proxyuser.mapred.groups</name>
+    <value>*</value>
+  </property>
+  <property>
+    <name>hadoop.proxyuser.mapred.hosts</name>
+    <value>*</value>
+  </property>
+</configuration>

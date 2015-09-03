@@ -1,46 +1,45 @@
 FROM centos
 MAINTAINER cstotzer <cstotzer@diso.ch>
 
+ENV SERF_CONFIG_DIR /etc/serf
+
+RUN yum upgrade -y; \
+yum clean all; \
+yum install -y openssh-server openssh-clients sudo vim wget unzip dnsmasq bind-utils java-1.8.0-openjdk net-tools lsof nmap; \
+yum clean all
+
 # Add the CDH4 repository
-ADD cloudera-cdh5.repo /etc/yum.repos.d/
-
-# Upgrade the images packages
-RUN yum clean all && yum upgrade -y
-
-# Install software 
-RUN yum clean all && yum install -y openssh-server openssh-clients vim hadoop-yarn hadoop-hdfs java-1.8.0-openjdk unzip curl dnsmasq bind-utils && yum clean all	
-
-# dnsmasq configuration
-ADD dnsmasq/* /etc/
+# Adding cloudera repos
+RUN wget http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/cloudera-cdh5.repo; \
+mv cloudera-cdh5.repo /etc/yum.repos.d/cloudera-cdh5.repo;\
+rpm --import http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera
 
 # install serf
-RUN curl -Lso serf.zip https://dl.bintray.com/mitchellh/serf/0.5.0_linux_amd64.zip && \
-unzip serf.zip -d /bin && \
+RUN curl -Lso serf.zip https://dl.bintray.com/mitchellh/serf/0.5.0_linux_amd64.zip; \
+unzip serf.zip -d /bin; \
 rm serf.zip
 
-# configure serf
-ENV SERF_CONFIG_DIR /etc/serf
+ADD dnsmasq/* /etc/
 ADD serf/* $SERF_CONFIG_DIR/
 ADD handlers $SERF_CONFIG_DIR/handlers
+ADD config/ /tmp/
+
+# configure serf
 RUN chmod +x  $SERF_CONFIG_DIR/event-router.sh $SERF_CONFIG_DIR/start-serf-agent.sh
 
-ADD config/* /tmp
-
-RUN ssh-keygen -A
-
-# configure password-less ssh
-RUN mkdir /var/run/sshd && \
-ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
-mv /tmp/ssh_config ~/.ssh/config && \
-chmod 600 /root/.ssh/* &&
+# configure ssh
+RUN ssh-keygen -A; \
+mkdir /var/run/sshd; \
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ''; \
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys; \
+mv /tmp/ssh_config ~/.ssh/config; \
+chmod 600 /root/.ssh/* 
 
 # run general daemons
-RUN mv /tmp/start-ssh-serf.sh ~/start-ssh-serf.sh && \
-chmod +x ~/start-ssh-serf.sh && \
-chmod 1777 tmp
+RUN mv /tmp/start-ssh-serf.sh ~/start-ssh-serf.sh; \
+chmod +x ~/start-ssh-serf.sh;
 
 # create root password
 RUN echo 'root:root' | chpasswd
 
-CMD 'bash'
+CMD '/root/start-ssh-serf.sh'; 'bash'

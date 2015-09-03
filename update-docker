@@ -1,0 +1,2 @@
+sudo dnf update https://kojipkgs.fedoraproject.org//packages/docker/1.8.1/2.git3c1d7c8.fc22/x86_64/docker-1.8.1-2.git3c1d7c8.fc22.x86_64.rpm \
+https://kojipkgs.fedoraproject.org//packages/docker/1.8.1/2.git3c1d7c8.fc22/x86_64/docker-selinux-1.8.1-2.git3c1d7c8.fc22.x86_64.rpm 

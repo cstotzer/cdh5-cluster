@@ -1,17 +1,38 @@
 #!/usr/bin/env bash
-server=$1
-master=$2
+
 env_string=""
+interactive=true
+
+while getopts ":p:d" opt; do
+	case $opt in
+		p)
+		  #echo "-p was triggered, Parameter: $OPTARG" >&2
+			env_string="${env_string} -p $OPTARG"
+			;;
+		d)
+			env_string="${env_string} -dt"
+			interactive=false
+			;;
+	esac
+done
+
+shift "$((OPTIND-1))"
+
+image=$1
+name=$2
+master=$3
+
 if [ -n "$master" ] ; then
-	echo "toto $master"
 	master_ip=$(sudo docker inspect --format="{{.NetworkSettings.IPAddress}}" $master)
-	echo $master_ip
-	#env_string="-e JOIN_IP=${master_ip} --link ${master}:${master}"
-	env_string="-e JOIN_IP=${master_ip}"
-	echo $env_string
+	env_string="${env_string} -e JOIN_IP=${master_ip}"
+fi
+
+if [[ interactive = true ]] ; then
+	env_string="${env_string} -it"
 fi
 
 echo $env_string
 
-sudo docker rm -f $server
-sudo docker run -P -v /etc/localtime:/etc/localtime:ro -t -i --dns 127.0.0.1 $env_string -h $server.localdomain --name $server cstotzer/$server
+sudo docker rm -f $name
+sudo docker run -v /etc/localtime:/etc/localtime:ro --dns 127.0.0.1 $env_string -h $name.localdomain --name $name $image
+./register-nodes.sh > /dev/null

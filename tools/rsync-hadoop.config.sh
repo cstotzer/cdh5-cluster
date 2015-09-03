@@ -1,0 +1,1 @@
+rsync -avz -e ssh . cdh5-datanode-1:/etc/hadoop/conf.cdh5/
